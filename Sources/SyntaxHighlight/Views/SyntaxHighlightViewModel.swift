@@ -14,7 +14,8 @@ class SyntaxHighlightViewModel: ObservableObject {
         Task {
             do {
                 let downloadedTheme = try await Theme(contentsOf: theme.url)
-                let downloadedGrammar = try await Grammar(contentsOf: grammar.url)
+                let downloadedGrammar = try await Grammar(url: grammar.url)
+                
                 await MainActor.run {
                     self.highlighter = Highlighter(string: string, theme: downloadedTheme, grammar: downloadedGrammar)
                 }

@@ -16,10 +16,16 @@ public extension TMSyntax.Grammar {
             throw URLError(.badURL)
         }
 
+        try await self.init(url: url)
+    }
+    
+    convenience init(url: URL?) async throws {
+        guard let url = url else {
+            throw URLError(.badURL)
+        }
+        
         if url.isFileURL {
-            // Handling local file URL
-            let data = try Data(contentsOf: url)
-            try self.init(data: data, path: url)
+            try self.init(contentsOf: url)
         } else {
             // Handling remote URL
             let (data, _) = try await URLSession.withCache.data(from: url)

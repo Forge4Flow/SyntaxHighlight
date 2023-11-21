@@ -24,7 +24,9 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "SyntaxHighlight",
-            dependencies: ["TMSyntax", "DynamicColor"]),
+            dependencies: ["TMSyntax", "DynamicColor"],
+            resources: [.process("Resources")]
+        ),
         .testTarget(
             name: "SyntaxHighlightTests",
             dependencies: ["SyntaxHighlight"],

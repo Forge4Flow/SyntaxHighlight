@@ -29,11 +29,11 @@ public struct ScopeName: Equatable {
 
 """
 
-    override func setUpWithError() throws {
+    func setUpWithError() async throws {
         let url = Bundle.module.url(forResource: "swift.tmLanguage", withExtension: "json")!
         grammar = try Grammar(contentsOf: url)
         let themeURL = Bundle.module.url(forResource: "Tomorrow", withExtension: "tmTheme")!
-        theme = try Theme(contentsOf: themeURL)
+        theme = try await Theme(contentsOf: themeURL)
     }
 
     func testStyledStrings() throws {
