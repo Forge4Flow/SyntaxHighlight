@@ -56,7 +56,7 @@ public struct Theme {
             try self.init(dictionary: plist)
         } else {
             // Handling remote URL
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let (data, _) = try await URLSession.withCache.data(from: url)
             guard let plist = try PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: AnyObject] else {
                 throw Error.decodeError
             }

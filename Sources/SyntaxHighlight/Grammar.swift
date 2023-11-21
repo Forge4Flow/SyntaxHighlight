@@ -22,7 +22,7 @@ public extension TMSyntax.Grammar {
             try self.init(data: data, path: url)
         } else {
             // Handling remote URL
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let (data, _) = try await URLSession.withCache.data(from: url)
             try self.init(data: data)
         }
     }
