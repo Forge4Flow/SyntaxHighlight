@@ -38,12 +38,30 @@ public struct Theme {
         }
         self.scopeStyles = scopeStyles
     }
-
-    public init(contentsOf url: URL) throws {
-        guard let dic = try NSDictionary(contentsOf: url, error: ()) as? [String : AnyObject] else {
-            throw Error.decodeError
+    
+    public init(contentsOf urlString: String) async throws {
+        guard let url = URL(string: urlString) else {
+            throw URLError(.badURL)
         }
-        try self.init(dictionary: dic)
+        
+        try await self.init(contentsOf: url)
+    }
+
+    public init(contentsOf url: URL) async throws {
+        if url.isFileURL {
+            // Handling local file URL
+            guard let plist = NSDictionary(contentsOf: url) as? [String: AnyObject] else {
+                throw Error.decodeError
+            }
+            try self.init(dictionary: plist)
+        } else {
+            // Handling remote URL
+            let (data, _) = try await URLSession.withCache.data(from: url)
+            guard let plist = try PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: AnyObject] else {
+                throw Error.decodeError
+            }
+            try self.init(dictionary: plist)
+        }
     }
 
     func selectScopeStyle(for scopeName: ScopeName) -> Style? {
