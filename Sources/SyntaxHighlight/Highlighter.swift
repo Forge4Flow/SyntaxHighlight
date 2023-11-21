@@ -9,8 +9,6 @@
 import Foundation
 import TMSyntax
 
-public typealias Grammar = TMSyntax.Grammar
-
 public struct Highlighter {
     public var string: String
     public var theme: Theme
