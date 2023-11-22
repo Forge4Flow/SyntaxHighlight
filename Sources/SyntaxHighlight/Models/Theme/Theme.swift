@@ -6,7 +6,7 @@
 //  Copyright © 2020 dev.aoyama. All rights reserved.
 //
 
-import Foundation
+import SwiftUI
 
 public struct Theme {
     public enum Error : LocalizedError {
@@ -21,6 +21,7 @@ public struct Theme {
 
     public var UUID: String
     public var name: String
+    public var backgroundColor: SwiftUI.Color
     public var scopeStyles: [Style]
 
     public init(dictionary: [String: Any]) throws {
@@ -30,10 +31,19 @@ public struct Theme {
             else { throw Error.decodeError }
         self.UUID = UUID
         self.name = name
+        self.backgroundColor = .clear
         var scopeStyles: [Style] = []
         for raw in rawSettings {
             if let scopeStyle = Style(from: raw) {
                 scopeStyles.append(scopeStyle)
+            }
+
+            // Check for a settings dictionary within each raw setting
+            if let settingsDict = raw["settings"] as? [String: AnyObject] {
+                // Check if this settings dictionary contains a background key
+                if let bgColor = settingsDict["background"] as? String {
+                    self.backgroundColor = SwiftUI.Color(Color(hex: bgColor)) ?? .clear // Store the background color
+                }
             }
         }
         self.scopeStyles = scopeStyles
@@ -47,7 +57,11 @@ public struct Theme {
         try await self.init(contentsOf: url)
     }
 
-    public init(contentsOf url: URL) async throws {
+    public init(contentsOf url: URL?) async throws {
+        guard let url = url else {
+            throw URLError(.badURL)
+        }
+        
         if url.isFileURL {
             // Handling local file URL
             guard let plist = NSDictionary(contentsOf: url) as? [String: AnyObject] else {

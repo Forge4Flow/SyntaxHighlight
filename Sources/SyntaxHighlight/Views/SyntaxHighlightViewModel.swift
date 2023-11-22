@@ -5,7 +5,7 @@
 //  Created by BoiseITGuru on 11/21/23.
 //
 
-import Foundation
+import SwiftUI
 
 class SyntaxHighlightViewModel: ObservableObject {
     @Published var highlighter: Highlighter?

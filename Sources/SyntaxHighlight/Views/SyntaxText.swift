@@ -8,27 +8,62 @@
 import SwiftUI
 
 public struct SyntaxText: View {
-    @StateObject private var viewModel = SyntaxHighlightViewModel()
-    @State private var code: String
-    @State private var theme: Themes
-    @State private var grammar: GrammarTypes
+    private var code: String
+    private var theme: Themes
+    private var grammar: GrammarTypes
+    @State private var highlighter: Highlighter?
 
     public init(code: String, theme: Themes, grammar: GrammarTypes) {
         self.code = code
         self.theme = theme
         self.grammar = grammar
     }
-    
+
     public var body: some View {
+        ViewThatFits {
+            verticalView
+            ScrollView(.horizontal) {
+                verticalView
+            }
+        }
+        .onAppear {
+            loadHighlighter()
+        }
+    }
+    
+    private var verticalView: some View {
+        ViewThatFits {
+            codeGroup
+            ScrollView(.vertical) {
+                codeGroup
+            }
+        }
+    }
+    
+    private var codeGroup: some View {
         Group {
-            if let highlighter = viewModel.highlighter {
+            if let highlighter = highlighter {
                 Text(from: highlighter)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(1)
+                    .background(highlighter.theme.backgroundColor.opacity(0.8))
             } else {
                 Text(code)
             }
         }
-        .onAppear {
-            viewModel.loadHighlighter(string: code, theme: theme, grammar: grammar)
+    }
+
+    private func loadHighlighter() {
+        Task {
+            do {
+                let downloadedTheme = try await Theme(contentsOf: theme.url)
+                let downloadedGrammar = try await Grammar(url: grammar.url)
+
+                self.highlighter = Highlighter(string: code, theme: downloadedTheme, grammar: downloadedGrammar)
+            } catch {
+                // Handle errors
+                print("Error loading syntax highlighter: \(error)")
+            }
         }
     }
 }
