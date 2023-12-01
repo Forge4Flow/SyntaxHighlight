@@ -44,7 +44,7 @@ public struct SyntaxText: View {
         Group {
             if let highlighter = highlighter {
                 Text(from: highlighter)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                     .padding(1)
                     .background(highlighter.theme.backgroundColor.opacity(0.8))
             } else {
